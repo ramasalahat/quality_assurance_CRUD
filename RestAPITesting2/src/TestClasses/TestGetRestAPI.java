@@ -241,5 +241,43 @@ public class TestGetRestAPI {
 
 	}
 	
+	@Test
+	public void caseAtestUpdateResourceWithEmpty() throws Exception {
+		// create a new resource to be updated and get its id
+		HttpURLConnection connection2 = RestClientHandler.connectServer(URLs.crudcrud, HTTPMethod.POST,
+				HTTPRequestsContentTypes.JSON);
+		String resquestJSONObject2 = JSONUtils.readJSONObjectFromFile(FilesPaths.createResourceJSONFILE);
+				RestClientHandler.sendPost(connection2, resquestJSONObject2, HTTPRequestsContentTypes.JSON);
+		String response2 = RestClientHandler.readResponse(connection2);
+		System.out.println(response2);
+		JSONObject jsonObject2 = (JSONObject) JSONUtils.convertStringToJSON(response2);
+		String id = jsonObject2.get("_id").toString();
+		
+		// create the connection to change the record
+		HttpURLConnection connection = RestClientHandler.connectServer(URLs.crudcrud +"/" + id, HTTPMethod.PUT,
+				HTTPRequestsContentTypes.JSON);
+		// 2. Prepare Json Object
+		String resquestJSONObject = "{}";
+		// 3. Put Request
+		RestClientHandler.sendPut(connection, resquestJSONObject, HTTPRequestsContentTypes.JSON);
+		// 4. Reading Response
+		System.out.println(connection.getResponseCode());
+		assertTrue("request sent", connection.getResponseCode() == 200);
+
+		String response = RestClientHandler.readResponse(connection);
+		System.out.println(response);
+
+		// get the new record
+		HttpURLConnection connection3 = RestClientHandler.connectServer(URLs.crudcrud + '/' + id, HTTPMethod.GET,
+				HTTPRequestsContentTypes.JSON);
+		String response3 = RestClientHandler.readResponse(connection3);
+		System.out.println(response3);
+		JSONObject jsonObject = (JSONObject) JSONUtils.convertStringToJSON(response3);
+
+		
+		assertTrue("validated", !jsonObject.equals(jsonObject2));
+
+	}
+	
 
 }
